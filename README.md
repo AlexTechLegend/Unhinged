@@ -14,7 +14,9 @@ extension/
 
 ## Development
 
-1. Load the `extension` folder as an unpacked extension in Chrome.
+1. Load the `extension` folder as an unpacked extension in Chrome. If you see an
+   error like **"Manifest file is missing or unreadable"**, double-check that you
+   selected the `extension` directory itself rather than the repository root.
 2. Click the extension icon to open or close the sidebar on any page.
 3. Use **Capture Snippet** to select a region. The screenshot and a placeholder analysis appear in the sidebar.
 4. Add an optional note and click **Save Note** to store it using `chrome.storage.sync`.
