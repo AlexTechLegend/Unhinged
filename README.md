@@ -1,6 +1,6 @@
 # Unhinged Chrome Extension
 
-This repository contains a simple Chrome extension named **Stock Chart Analyzer**. It opens a collapsible sidebar on any page, lets you capture a region of the screen, and shows a mocked analysis of stock chart patterns. Notes and screenshots can be stored using Chrome sync storage.
+This repository contains a Chrome extension named **Stock Chart Analyzer**. It opens a collapsible sidebar on any page, lets you capture a region of the screen, and performs technical analysis on sample OHLCV data. The sidebar displays indicators, pattern detection, and simple backtest results. Notes and screenshots can be stored using Chrome sync storage.
 
 ## Directory Structure
 
@@ -22,6 +22,19 @@ extension/
 4. Add an optional note and click **Save Note** to store it using `chrome.storage.sync`.
 
 The analysis logic is stubbed for demonstration but shows where a real AI model could be integrated.
+
+## Analyzer Features
+
+The extension includes a small analysis module that demonstrates how trade signals
+could be generated. The sample data is synthetic, but the module illustrates:
+
+* Moving-average crossover and RSI calculations
+* Naive candlestick pattern detection
+* Automatic support/resistance level identification
+* Risk/reward estimation and simple backtesting
+
+These outputs appear below the captured screenshot inside the sidebar. They can
+be saved along with notes for later review.
 
 ## Testing
 

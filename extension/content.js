@@ -129,11 +129,22 @@ function showResult(dataUrl) {
 }
 
 function analyzeChart() {
-  // Placeholder for AI analysis
-  return [
-    'Trendline suggests uptrend',
-    'Bearish engulfing pattern near resistance – potential reversal'
-  ];
+  const data = window.StockAnalyzer.sampleData();
+  const result = window.StockAnalyzer.analyzeData(data);
+  const rr = window.StockAnalyzer.riskReward(
+    data[data.length - 1].close,
+    result.levels.support,
+    result.levels.resistance
+  );
+  const lines = [];
+  lines.push('Support: ' + result.levels.support.toFixed(2));
+  lines.push('Resistance: ' + result.levels.resistance.toFixed(2));
+  if (result.patterns.length) lines.push('Patterns: ' + result.patterns.join(', '));
+  lines.push('RSI: ' + result.rsi.toFixed(2));
+  lines.push(...result.signals);
+  lines.push('Backtest PnL: ' + result.backtest.pnl.toFixed(2));
+  lines.push('Risk/Reward Ratio: ' + rr.ratio);
+  return lines;
 }
 
 function saveCurrentNote() {
