@@ -8,6 +8,7 @@ This repository provides a basic stock price action analyzer implemented in pure
 - Signal generation logic combining indicator confluence
 - A lightweight backtester
 - Example script (`run_example.py`)
+- Optional screenshot utilities using Pillow
 
 The implementation avoids third-party dependencies so indicator calculations are minimal.
 
@@ -24,4 +25,8 @@ Then execute:
 ```
 python run_example.py
 ```
+
+The example attempts to capture a screenshot using Pillow. If Pillow is not
+installed or your environment lacks screen access, a runtime message will be
+displayed instead of saving a screenshot.
 
