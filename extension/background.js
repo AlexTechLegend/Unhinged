@@ -1,5 +1,14 @@
 chrome.action.onClicked.addListener((tab) => {
-  chrome.tabs.sendMessage(tab.id, { action: 'toggle_sidebar' });
+  chrome.tabs.sendMessage(tab.id, { action: 'toggle_sidebar' }, () => {
+    if (chrome.runtime.lastError) {
+      // Content script might not be loaded; inject script and styles then retry
+      chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ['content.js'] }, () => {
+        chrome.scripting.insertCSS({ target: { tabId: tab.id }, files: ['styles.css'] }, () => {
+          chrome.tabs.sendMessage(tab.id, { action: 'toggle_sidebar' });
+        });
+      });
+    }
+  });
 });
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {

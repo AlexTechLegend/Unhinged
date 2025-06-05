@@ -77,9 +77,19 @@ function startSelection() {
 }
 
 function captureRect(rect) {
-  chrome.runtime.sendMessage({ action: 'capture_screen' }, ({ dataUrl }) => {
+  chrome.runtime.sendMessage({ action: 'capture_screen' }, (res) => {
+    if (chrome.runtime.lastError) {
+      console.error('capture_screen failed:', chrome.runtime.lastError);
+      alert('Capture failed: ' + chrome.runtime.lastError.message);
+      return;
+    }
+    if (!res || res.error) {
+      const msg = res && res.error ? res.error : 'Unknown error';
+      alert('Capture failed: ' + msg);
+      return;
+    }
     const img = new Image();
-    img.src = dataUrl;
+    img.src = res.dataUrl;
     img.onload = () => {
       const scale = window.devicePixelRatio;
       const canvas = document.createElement('canvas');
