@@ -3,7 +3,7 @@
   "name": "Stock Chart Analyzer",
   "description": "Capture screen snippets and analyze stock charts",
   "version": "0.1",
-  "permissions": ["storage", "activeTab", "scripting"],
+  "permissions": ["storage", "activeTab", "scripting", "tabs"],
   "background": {
     "service_worker": "background.js"
   },
