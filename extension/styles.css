@@ -1,0 +1,62 @@
+/* Dark theme sidebar and overlay styles */
+#sc-sidebar {
+  position: fixed;
+  top: 0;
+  right: -320px; /* hidden off screen */
+  width: 320px;
+  height: 100%;
+  background: #1f2937; /* dark gray */
+  color: #e5e7eb;
+  border-left: 1px solid #334155;
+  z-index: 2147483647;
+  transition: right 0.3s ease;
+  overflow-y: auto;
+  font-family: Arial, sans-serif;
+}
+
+#sc-sidebar.open {
+  right: 0;
+}
+
+#sc-sidebar header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background: #0f172a; /* darker */
+  cursor: move;
+}
+
+#sc-sidebar button {
+  margin: 5px;
+  padding: 5px 10px;
+  background: #2563eb; /* blue */
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+}
+
+#sc-sidebar button:hover {
+  background: #1d4ed8;
+}
+
+#sc-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  cursor: crosshair;
+  z-index: 2147483646;
+  background: rgba(0,0,0,0.2);
+}
+
+#sc-rect {
+  position: absolute;
+  border: 2px dashed #f87171; /* red */
+  pointer-events: none;
+}
+
+#sc-notes-list img {
+  max-width: 100%;
+}

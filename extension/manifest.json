@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "Stock Chart Analyzer",
+  "description": "Capture screen snippets and analyze stock charts",
+  "version": "0.1",
+  "permissions": ["storage", "activeTab", "scripting", "tabs"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Open Sidebar"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["analyzer.js", "content.js"],
+      "css": ["styles.css"]
+    }
+  ]
+}
