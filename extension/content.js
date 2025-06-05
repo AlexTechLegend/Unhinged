@@ -3,43 +3,73 @@
   window.StockAnalyzerLoaded = true;
 
   let sidebar;
+  let dragOffsetX = 0;
+  let dragOffsetY = 0;
 
   function createSidebar() {
     if (sidebar) return;
-  sidebar = document.createElement('div');
-  sidebar.id = 'sc-sidebar';
-  sidebar.innerHTML = `
-    <header>
-      <span>Stock Analyzer</span>
-      <button id="sc-close">✕</button>
-    </header>
-    <div id="sc-body" class="p-2">
-      <button id="sc-capture" class="bg-blue-500 text-white rounded px-2 py-1">Capture Snippet</button>
-      <div id="sc-result" class="my-2"></div>
-      <div id="sc-notes" class="my-2">
-        <textarea id="sc-note" placeholder="Add note" class="w-full border"></textarea>
-        <button id="sc-save" class="bg-green-500 text-white rounded px-2 py-1">Save Note</button>
-        <div id="sc-notes-list" class="mt-2"></div>
+    sidebar = document.createElement('div');
+    sidebar.id = 'sc-sidebar';
+    sidebar.innerHTML = `
+      <header>
+        <span>Stock Analyzer</span>
+        <button id="sc-close">✕</button>
+      </header>
+      <div id="sc-body" class="p-2">
+        <button id="sc-capture" class="rounded px-2 py-1">Capture Snippet</button>
+        <div id="sc-result" class="my-2"></div>
+        <div id="sc-notes" class="my-2">
+          <textarea id="sc-note" placeholder="Add note" class="w-full border text-black"></textarea>
+          <button id="sc-save" class="rounded px-2 py-1 bg-green-600 text-white">Save Note</button>
+          <div id="sc-notes-list" class="mt-2"></div>
+        </div>
       </div>
-    </div>
-  `;
-  document.body.appendChild(sidebar);
-  document.getElementById('sc-close').onclick = toggleSidebar;
-  document.getElementById('sc-capture').onclick = startSelection;
-  document.getElementById('sc-save').onclick = saveCurrentNote;
-  loadNotes();
-}
+    `;
+    document.body.appendChild(sidebar);
+    sidebar.querySelector('header').addEventListener('mousedown', startDrag);
+    document.getElementById('sc-close').onclick = toggleSidebar;
+    document.getElementById('sc-capture').onclick = startSelection;
+    document.getElementById('sc-save').onclick = saveCurrentNote;
+    loadNotes();
+  }
 
 function toggleSidebar() {
   createSidebar();
-  sidebar.classList.toggle('open');
+  if (sidebar.classList.contains('open')) {
+    sidebar.classList.remove('open');
+    sidebar.style.right = '-320px';
+    sidebar.style.left = 'auto';
+    sidebar.style.top = '0px';
+  } else {
+    sidebar.classList.add('open');
+    sidebar.style.right = '0px';
+  }
 }
 
-chrome.runtime.onMessage.addListener((msg) => {
-  if (msg.action === 'toggle_sidebar') {
-    toggleSidebar();
+  chrome.runtime.onMessage.addListener((msg) => {
+    if (msg.action === 'toggle_sidebar') {
+      toggleSidebar();
+    }
+  });
+
+  function startDrag(e) {
+    const rect = sidebar.getBoundingClientRect();
+    dragOffsetX = e.clientX - rect.left;
+    dragOffsetY = e.clientY - rect.top;
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', endDrag);
   }
-});
+
+  function onDrag(e) {
+    sidebar.style.left = e.clientX - dragOffsetX + 'px';
+    sidebar.style.top = e.clientY - dragOffsetY + 'px';
+    sidebar.style.right = 'auto';
+  }
+
+  function endDrag() {
+    document.removeEventListener('mousemove', onDrag);
+    document.removeEventListener('mouseup', endDrag);
+  }
 
 function startSelection() {
   const overlay = document.createElement('div');
@@ -124,30 +154,23 @@ function showResult(dataUrl) {
   img.src = dataUrl;
   img.className = 'my-2 max-w-full';
   res.appendChild(img);
-  const analysis = analyzeChart();
-  const analysisDiv = document.createElement('div');
-  analysisDiv.className = 'text-sm bg-gray-100 p-2 mt-2';
-  analysisDiv.textContent = analysis.join('\n');
-  res.appendChild(analysisDiv);
+  img.onload = () => {
+    const analysis = analyzeChart(img);
+    const analysisDiv = document.createElement('div');
+    analysisDiv.className = 'text-sm bg-gray-700 p-2 mt-2';
+    analysisDiv.textContent = analysis.join('\n');
+    res.appendChild(analysisDiv);
+    res.dataset.analysis = analysis.join('\n');
+  };
   res.dataset.currentImage = dataUrl;
 }
 
-function analyzeChart() {
-  const data = window.StockAnalyzer.sampleData();
-  const result = window.StockAnalyzer.analyzeData(data);
-  const rr = window.StockAnalyzer.riskReward(
-    data[data.length - 1].close,
-    result.levels.support,
-    result.levels.resistance
-  );
+function analyzeChart(imgEl) {
+  const info = window.StockAnalyzer.analyzeImage(imgEl);
   const lines = [];
-  lines.push('Support: ' + result.levels.support.toFixed(2));
-  lines.push('Resistance: ' + result.levels.resistance.toFixed(2));
-  if (result.patterns.length) lines.push('Patterns: ' + result.patterns.join(', '));
-  lines.push('RSI: ' + result.rsi.toFixed(2));
-  lines.push(...result.signals);
-  lines.push('Backtest PnL: ' + result.backtest.pnl.toFixed(2));
-  lines.push('Risk/Reward Ratio: ' + rr.ratio);
+  lines.push('Trend: ' + info.trend);
+  lines.push('Support level: ' + (info.support * 100).toFixed(1) + '%');
+  lines.push('Resistance level: ' + (info.resistance * 100).toFixed(1) + '%');
   return lines;
 }
 
@@ -155,7 +178,7 @@ function saveCurrentNote() {
   const img = document.getElementById('sc-result').dataset.currentImage;
   if (!img) return;
   const noteText = document.getElementById('sc-note').value;
-  const analysis = analyzeChart().join('\n');
+  const analysis = document.getElementById('sc-result').dataset.analysis || '';
   chrome.storage.sync.get({ notes: [] }, (data) => {
     data.notes.push({ image: img, analysis, note: noteText });
     chrome.storage.sync.set({ notes: data.notes }, loadNotes);

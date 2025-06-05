@@ -1,6 +1,6 @@
 # Unhinged Chrome Extension
 
-This repository contains a Chrome extension named **Stock Chart Analyzer**. It opens a collapsible sidebar on any page, lets you capture a region of the screen, and performs technical analysis on sample OHLCV data. The sidebar displays indicators, pattern detection, and simple backtest results. Notes and screenshots can be stored using Chrome sync storage.
+This repository contains a Chrome extension named **Stock Chart Analyzer**. It opens a dark-themed, draggable sidebar on any page, lets you capture a region of the screen, and analyzes the captured snippet in real time. Basic technical metrics are extracted from the screenshot and displayed alongside your notes.
 
 ## Directory Structure
 
@@ -9,7 +9,7 @@ extension/
   manifest.json      - Chrome manifest (MV3)
   background.js      - Service worker for capture and toggle events
   content.js         - Injected script that creates the sidebar and handles UI
-  styles.css         - Basic styles for sidebar and overlay
+  styles.css         - Dark theme styles and drag behavior
 ```
 
 ## Development
@@ -18,8 +18,9 @@ extension/
    error like **"Manifest file is missing or unreadable"**, double-check that you
    selected the `extension` directory itself rather than the repository root.
 2. Click the extension icon to open or close the sidebar on any page. If the page was open before installation, the service worker injects both `analyzer.js` and `content.js` so you shouldn't see the "Could not establish connection" error. The content script ignores duplicate loads to avoid "Identifier already declared" errors.
-3. Use **Capture Snippet** to select a region. The screenshot and a placeholder analysis appear in the sidebar. The extension requests the `tabs` permission so it can capture the visible tab.
-4. Add an optional note and click **Save Note** to store it using `chrome.storage.sync`.
+3. Use **Capture Snippet** to select a region. The screenshot is analyzed on the fly for basic trend direction and support/resistance levels.
+4. Drag the sidebar by its header to position it anywhere on the page.
+5. Add an optional note and click **Save Note** to store it using `chrome.storage.sync`.
 
 The analysis logic is stubbed for demonstration but shows where a real AI model could be integrated.
 

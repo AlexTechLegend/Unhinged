@@ -117,6 +117,38 @@ function backtest(data) {
   return { pnl, trades };
 }
 
+function analyzeImage(img) {
+  const canvas = document.createElement('canvas');
+  canvas.width = img.naturalWidth || img.width;
+  canvas.height = img.naturalHeight || img.height;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(img, 0, 0);
+  const width = canvas.width;
+  const height = canvas.height;
+  const data = ctx.getImageData(0, 0, width, height).data;
+  const line = [];
+  for (let x = 0; x < width; x++) {
+    let bestY = 0;
+    let minL = 765;
+    for (let y = 0; y < height; y++) {
+      const idx = (y * width + x) * 4;
+      const l = data[idx] + data[idx + 1] + data[idx + 2];
+      if (l < minL) {
+        minL = l;
+        bestY = y;
+      }
+    }
+    line.push(bestY);
+  }
+  const first = line[0];
+  const last = line[line.length - 1];
+  const slope = (last - first) / width;
+  const trend = slope < -0.1 ? 'up' : slope > 0.1 ? 'down' : 'sideways';
+  const support = Math.max(...line) / height;
+  const resistance = Math.min(...line) / height;
+  return { trend, support, resistance };
+}
+
 function analyzeData(data) {
   const patterns = detectCandlestickPatterns(data);
   const levels = supportResistanceLevels(data);
@@ -153,5 +185,6 @@ function sampleData() {
 window.StockAnalyzer = {
   analyzeData,
   sampleData,
-  riskReward
+  riskReward,
+  analyzeImage
 };
