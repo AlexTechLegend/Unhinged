@@ -1,8 +1,8 @@
 chrome.action.onClicked.addListener((tab) => {
   chrome.tabs.sendMessage(tab.id, { action: 'toggle_sidebar' }, () => {
     if (chrome.runtime.lastError) {
-      // Content script might not be loaded; inject script and styles then retry
-      chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ['content.js'] }, () => {
+      // Content scripts might not be loaded; inject them then retry
+      chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ['analyzer.js', 'content.js'] }, () => {
         chrome.scripting.insertCSS({ target: { tabId: tab.id }, files: ['styles.css'] }, () => {
           chrome.tabs.sendMessage(tab.id, { action: 'toggle_sidebar' });
         });

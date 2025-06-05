@@ -1,7 +1,11 @@
-let sidebar;
+(function() {
+  if (window.StockAnalyzerLoaded) return;
+  window.StockAnalyzerLoaded = true;
 
-function createSidebar() {
-  if (sidebar) return;
+  let sidebar;
+
+  function createSidebar() {
+    if (sidebar) return;
   sidebar = document.createElement('div');
   sidebar.id = 'sc-sidebar';
   sidebar.innerHTML = `
@@ -185,4 +189,6 @@ function loadNotes() {
     link.href = 'https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css';
     document.head.appendChild(link);
   }
+})();
+
 })();
